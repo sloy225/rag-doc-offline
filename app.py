@@ -16,7 +16,7 @@ st.caption("Python + Streamlit + Ollama + FAISS")
 
 with st.sidebar:
     st.header("Configuration")
-    llm_model = st.text_input("Modèle de génération Ollama", value="mistral:latest")
+    llm_model = st.text_input("Modèle de génération Ollama", value="llama3.2:3b")
     embed_model = st.text_input("Modèle d'embeddings Ollama", value="nomic-embed-text")
     top_k = st.slider("Nombre de passages retrouvés", 1, 8, 4)
 
