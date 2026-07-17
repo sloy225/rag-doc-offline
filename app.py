@@ -23,7 +23,7 @@ with st.sidebar:
 st.subheader("1. Déposer des documents")
 uploaded_files = st.file_uploader(
     "Ajoute des documents (PDF, DOCX, TXT, MD, CSV, XLSX)",
-    type=["pdf", "docx", "txt", "md", "csv", "xlsx"],
+    type=["pdf", "docx", "txt", "md", "csv", "xlsx", "doc", "xls", "ppt", "pptx", "odt", "ods", "odp"],
     accept_multiple_files=True,
 )
 
