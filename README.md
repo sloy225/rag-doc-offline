@@ -128,9 +128,9 @@ Dans les tests réalisés, la récupération était rapide et la génération re
 
 ## Remarques
 
-- `accept_multiple_files=True` dans Streamlit permet d’envoyer plusieurs fichiers d’un coup [web:251][web:52].
-- `Document` doit être importé depuis `langchain_core.documents` [web:15][web:58].
-- Le chargement local de FAISS nécessite `allow_dangerous_deserialization=True` lorsque tu relis ton propre index [web:216][web:47].
+- `accept_multiple_files=True` dans Streamlit permet d’envoyer plusieurs fichiers d’un coup .
+- `Document` doit être importé depuis `langchain_core.documents`.
+- Le chargement local de FAISS nécessite `allow_dangerous_deserialization=True` lorsque tu relis ton propre index.
 
 ## Dépannage
 
