@@ -12,11 +12,14 @@ INDEX_DIR = BASE_DIR / "index_store"
 
 
 def load_vectorstore(embed_model: str):
+
     index_file = INDEX_DIR / "index.faiss"
+
     if not index_file.exists():
         return None
 
     embeddings = OllamaEmbeddings(model=embed_model)
+
     return FAISS.load_local(
         str(INDEX_DIR),
         embeddings,
@@ -24,46 +27,116 @@ def load_vectorstore(embed_model: str):
     )
 
 
-@st.cache_resource
+@st.cache_resource(show_spinner=False)
 def get_vectorstore(embed_model: str):
+
     return load_vectorstore(embed_model)
 
 
-def answer_question(question: str, llm_model: str, embed_model: str, k: int = 4):
-    vs = get_vectorstore(embed_model)
-    if vs is None:
-        return None, [], 0.0, 0.0
+def search_documents(
+    question: str,
+    embed_model: str,
+    k: int = 4,
+):
 
-    retrieve_start = time.perf_counter()
-    docs = vs.similarity_search(question, k=k)
-    retrieve_end = time.perf_counter()
+    vs = get_vectorstore(embed_model)
+
+    if vs is None:
+        return [], 0.0
+
+    start = time.perf_counter()
+
+    docs = vs.similarity_search(
+        question,
+        k=k,
+    )
+
+    end = time.perf_counter()
+
+    return docs, end - start
+
+
+def generate_answer(
+    question: str,
+    docs,
+    llm_model: str,
+    memory: str = "",
+):
 
     context = "\n\n".join(
         [
-            f"[Source: {d.metadata.get('source', 'inconnu')}, page: {d.metadata.get('page', 'n/a')}]\n{d.page_content}"
+            f"[Source : {d.metadata.get('source','?')} | page : {d.metadata.get('page','-')}]\n{d.page_content}"
             for d in docs
         ]
     )
 
-    llm_start = time.perf_counter()
     prompt = f"""
-Tu es un assistant documentaire local.
-Réponds uniquement à partir du contexte fourni.
-Si l'information n'est pas présente, dis-le clairement.
-Réponse en français.
-Cite les sources à la fin sous la forme : Sources: fichier (page x).
+Tu es un assistant documentaire.
 
-Question:
+Tu dois répondre UNIQUEMENT à partir des documents.
+
+Si l'information n'existe pas,
+réponds :
+
+"Je n'ai pas trouvé cette information dans le corpus documentaire."
+
+Historique :
+
+{memory}
+
+Question :
+
 {question}
 
-Contexte:
+Contexte :
+
 {context}
+
+A la fin,
+ajoute les sources utilisées.
 """
-    llm = ChatOllama(model=llm_model, temperature=0)
+
+    start = time.perf_counter()
+
+    llm = ChatOllama(
+        model=llm_model,
+        temperature=0,
+    )
+
     response = llm.invoke(prompt)
-    llm_end = time.perf_counter()
 
-    retrieval_time = retrieve_end - retrieve_start
-    llm_time = llm_end - llm_start
+    end = time.perf_counter()
 
-    return response.content, docs, retrieval_time, llm_time
+    return response.content, end - start
+
+
+def answer_question(
+    question: str,
+    llm_model: str,
+    embed_model: str,
+    k: int = 4,
+    memory: str = "",
+):
+
+    docs, retrieval_time = search_documents(
+        question,
+        embed_model,
+        k,
+    )
+
+    if not docs:
+        return None, [], retrieval_time, 0.0
+
+    answer, llm_time = generate_answer(
+        question,
+        docs,
+        llm_model,
+        memory,
+    )
+
+    return (
+        answer,
+        docs,
+        retrieval_time,
+        llm_time,
+    )
