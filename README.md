@@ -63,7 +63,7 @@ Assistant   : Jean Dupont est le responsable informatique.
 Utilisateur : Quel est son email ?
 ```
 
-GrÃ¢ce à la mémoire, l'agent comprend que *"son"* fait référence à *Jean Dupont*.
+Grâce à la mémoire, l'agent comprend que *"son"* fait référence à *Jean Dupont*.
 
 ---
 
