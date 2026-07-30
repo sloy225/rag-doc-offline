@@ -19,3 +19,7 @@ index_store/
 # OS
 .DS_Store
 Thumbs.db
+
+# Base de données SQLite
+*.db
+rag_history.db
