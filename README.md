@@ -1,147 +1,132 @@
-# RAG documentaire offline agentique
 
-Application **RAG locale** développée avec **Python**, **Streamlit**, **Ollama**, **FAISS** et des modèles locaux.
+# 📚 RAG documentaire offline agentique
+
+Application RAG locale développee avec **Python**, **Streamlit**, **Ollama**, **FAISS** et des modèles locaux.
 
 Cette version fait évoluer un RAG documentaire classique vers un **assistant documentaire agentique** capable de choisir automatiquement l'action à effectuer selon la demande de l'utilisateur.
 
 ---
 
-# Objectif
+## 🎯 Objectif
 
-Ce projet permet d'interroger un corpus documentaire local **sans connexion Internet**, avec :
+Ce projet permet d'interroger un **corpus documentaire local** sans connexion Internet, avec :
 
-* indexation des documents ;
-* recherche sémantique ;
-* génération de réponses avec un LLM local ;
-* affichage des passages sources ;
-* mesure des performances ;
-* **prise de décision via un agent** ;
-* **mémoire conversationnelle** pour conserver le contexte des échanges.
-
----
-
-# Fonctionnalités
-
-## Recherche documentaire (RAG)
-
-L'utilisateur peut poser une question sur le contenu des documents.
-
-Le système :
-
-* recherche les passages les plus pertinents dans FAISS ;
-* construit un contexte documentaire ;
-* interroge un modèle Ollama ;
-* génère une réponse en français avec les sources.
+- ✅ Indexation des documents
+- ✅ Recherche sémantique
+- ✅ Génération de réponses avec un LLM local
+- ✅ Affichage des passages sources
+- ✅ Mesure des performances
+- ✅ Prise de décision via un agent
+- ✅ Mémoire conversationnelle pour conserver le contexte des échanges
 
 ---
 
-## Agent documentaire
+## 🚀 Fonctionnalités
 
-Une couche agentique a été ajoutée au-dessus du RAG.
+### Recherche documentaire (RAG)
 
-Avant d'exécuter une action, un **router décisionnel** analyse la question et choisit automatiquement le bon outil.
+L'utilisateur peut poser une question sur le contenu des documents. Le système :
 
-Les actions actuellement disponibles sont :
+1. Recherche les passages les plus pertinents dans FAISS
+2. Construit un contexte documentaire
+3. Interroge un modèle Ollama
+4. Génère une réponse en franÃ§ais avec les sources
 
-* **RAG** : répondre à une question documentaire ;
-* **Liste des documents** : afficher les fichiers présents dans le corpus ;
-* **Réindexation** : reconstruire l'index FAISS après l'ajout de nouveaux documents ;
-* **Métadonnées** : consulter les informations de l'index (nombre de documents, nombre de chunks, modèle d'embeddings utilisé...).
+### Agent documentaire
 
-Cette première version utilise un **router basé sur des règles** (mots-clés), facilement extensible vers un routeur piloté par un LLM.
+Une couche agentique a été ajoutée au-dessus du RAG. Avant d'exécuter une action, un **router décisionnel** analyse la question et choisit automatiquement le bon outil.
+
+**Actions disponibles :**
+
+| Action | Description |
+|--------|-------------|
+| **RAG** | Répondre à une question documentaire |
+| **Liste des documents** | Afficher les fichiers présents dans le corpus |
+| **Réindexation** | Reconstruire l'index FAISS après l'ajout de nouveaux documents |
+| **Métadonnées** | Consulter les informations de l'index (nombre de documents, chunks, modèle d'embeddings...) |
+
+> Cette première version utilise un **router basé sur des règles** (mots-clés), facilement extensible vers un routeur piloté par un LLM.
+
+### Mémoire conversationnelle
+
+L'application conserve l'historique récent de la conversation. Cette mémoire permet :
+
+- De garder le contexte des échanges
+- De faciliter les questions de suivi
+- De rendre l'interaction plus naturelle
+
+**Exemple :**
+
+```
+Utilisateur : Qui est le responsable informatique ?
+Assistant   : Jean Dupont est le responsable informatique.
+Utilisateur : Quel est son email ?
+```
+
+GrÃ¢ce à la mémoire, l'agent comprend que *"son"* fait référence à *Jean Dupont*.
 
 ---
 
-## Mémoire conversationnelle
+## 🏗️ Architecture
 
-L'application conserve l'historique récent de la conversation.
-
-Cette mémoire permet :
-
-* de garder le contexte des échanges ;
-* de faciliter les questions de suivi ;
-* de rendre l'interaction plus naturelle.
-
-Exemple :
-
-**Utilisateur**
-
-> Qui est le responsable informatique ?
-
-**Assistant**
-
-> Jean Dupont est le responsable informatique.
-
-**Utilisateur**
-
-> Quel est son email ?
-
-Grâce à la mémoire, l'agent comprend que **"son"** fait référence à **Jean Dupont**.
-
----
-
-# Architecture
-
-```text
+```
                  Streamlit
-                     |
-                     v
+                     │
+                     ▼
             Agent documentaire
-                     |
+                     │
               Router décisionnel
-                     |
-      +--------------+--------------+
-      |              |              |
-      v              v              v
-     RAG     Gestion du corpus   Métadonnées
-      |
-      v
-     FAISS
-      |
-      v
- Ollama (LLM local)
+                     │
+        ┌────────────┼────────────┐
+        ▼            ▼            ▼
+       RAG    Gestion du corpus   Métadonnées
+        │
+        ▼
+      FAISS
+        │
+        ▼
+  Ollama (LLM local)
 ```
 
 ---
 
-# Modèles utilisés
+## 🤖 Modèles utilisés
 
-* Modèle de génération : `llama3.2:3b`
-* Modèle d'embeddings : `nomic-embed-text`
+| Type | Modèle |
+|------|--------|
+| **Génération** | `llama3.2:3b` |
+| **Embeddings** | `nomic-embed-text` |
 
 Le modèle `llama3.2:3b` a été retenu pour offrir un bon compromis entre qualité des réponses et temps de génération sur la machine de test.
 
 ---
 
-# Arborescence
+## 📁 Arborescence
 
-```text
+```
 rag_offline_app/
-├── app.py
-├── ingest.py
-├── retriever.py
-├── agent.py
-├── router.py
-├── tools.py
-├── memory.py
-├── data/
-├── index_store/
-└── requirements.txt
+├── app.py              # Interface Streamlit
+├── ingest.py           # Chargement et indexation des documents
+├── retriever.py        # Recherche sémantique et génération
+├── agent.py            # Orchestration des actions
+├── router.py           # Décision de l'action à exécuter
+├── tools.py            # Outils de l'agent
+├── memory.py           # Gestion de la mémoire conversationnelle
+├── database.py         # Historique des interactions (SQLite)
+├── data/               # Corpus documentaire
+├── index_store/        # Stockage local de l'index FAISS
+├── rag_history.db      # Base de données (ignorée par Git)
+└── requirements.txt    # Dépendances Python
 ```
 
 ---
 
-# Prérequis
+## 📋 Prérequis
 
-* Python 3.10+
-* Ollama installé localement
+- Python 3.10+
+- Ollama installé localement
 
-Modèles Ollama nécessaires :
-
-* `llama3.2:3b`
-* `nomic-embed-text`
-
-Installation :
+**Modèles Ollama nécessaires :**
 
 ```bash
 ollama pull llama3.2:3b
@@ -150,25 +135,23 @@ ollama pull nomic-embed-text
 
 ---
 
-# Installation
+## 🔧 Installation
 
-Créer un environnement virtuel.
+### 1. Créer un environnement virtuel
 
-## Windows
-
-```bash
+**Windows :**
+```powershell
 python -m venv .venv
 .venv\Scripts\activate
 ```
 
-## Linux / macOS
-
+**Linux / macOS :**
 ```bash
 python -m venv .venv
 source .venv/bin/activate
 ```
 
-Installer les dépendances :
+### 2. Installer les dépendances
 
 ```bash
 pip install -r requirements.txt
@@ -176,7 +159,7 @@ pip install -r requirements.txt
 
 ---
 
-# Lancement
+## ▶️ Lancement
 
 ```bash
 streamlit run app.py
@@ -184,142 +167,138 @@ streamlit run app.py
 
 ---
 
-# Utilisation
+## 📖 Utilisation
 
-1. Déposer un ou plusieurs documents dans le dossier `data/` ou via l'interface.
-2. Cliquer sur **Lancer l'indexation**.
-3. Poser une question.
-4. L'agent détermine automatiquement l'action à exécuter.
-5. Consulter la réponse, les sources et les indicateurs de performance.
-
----
-
-# Formats supportés
-
-* PDF
-* DOCX
-* TXT
-* MD
-* CSV
-* XLSX
+1. **Déposer** un ou plusieurs documents dans le dossier `data/` ou via l'interface
+2. **Cliquer** sur *Lancer l'indexation*
+3. **Poser** une question
+4. L'agent **détermine automatiquement** l'action à exécuter
+5. **Consulter** la réponse, les sources et les indicateurs de performance
 
 ---
 
-# Fonctionnement
+## 📄 Formats supportés
 
-## 1. Indexation
+- PDF
+- DOCX
+- TXT
+- MD
+- CSV
+- XLSX
+- DOC
+- PPT
+- PPTX
+- ODT
+- ODS
+- ODP
+
+---
+
+## ⚙️ Fonctionnement
+
+### 1. Indexation
 
 Les documents sont :
 
-* chargés depuis le dossier `data/` ;
-* découpés en chunks ;
-* transformés en embeddings avec `nomic-embed-text` ;
-* enregistrés dans une base vectorielle FAISS.
+1. Chargés depuis le dossier `data/`
+2. Découpés en chunks
+3. Transformés en embeddings avec `nomic-embed-text`
+4. Enregistrés dans une base vectorielle FAISS
 
----
-
-## 2. Décision de l'agent
+### 2. Décision de l'agent
 
 Avant toute recherche, le router analyse la demande utilisateur.
 
-Exemples :
+| Question | Action |
+|----------|--------|
+| *"Quelle est la procédure RH ?"* | RAG |
+| *"Quels documents sont disponibles ?"* | Liste du corpus |
+| *"Réindexe les nouveaux documents."* | Réindexation |
+| *"Combien de documents sont indexés ?"* | Métadonnées |
 
-| Question                              | Action          |
-| ------------------------------------- | --------------- |
-| "Quelle est la procédure RH ?"        | RAG             |
-| "Quels documents sont disponibles ?"  | Liste du corpus |
-| "Réindexe les nouveaux documents."    | Réindexation    |
-| "Combien de documents sont indexés ?" | Métadonnées     |
-
----
-
-## 3. Recherche documentaire
+### 3. Recherche documentaire
 
 Lorsque l'action choisie est **RAG** :
 
-1. la question est transformée en embedding ;
-2. FAISS récupère les chunks les plus pertinents ;
-3. le contexte est envoyé à `llama3.2:3b` ;
-4. le modèle génère une réponse sourcée.
+1. La question est transformée en embedding
+2. FAISS récupère les chunks les plus pertinents
+3. Le contexte est envoyé à `llama3.2:3b`
+4. Le modèle génère une réponse sourcée
 
 ---
 
-# Mesure des performances
+## 📊 Mesure des performances
 
 L'application affiche :
 
-* temps de recherche dans FAISS ;
-* temps d'appel au LLM ;
-* temps total de traitement.
+- ⏱️ Temps de recherche dans FAISS
+- ⏱️ Temps d'appel au LLM
+- ⏱️ Temps total de traitement
 
-Dans les essais réalisés, la recherche vectorielle reste très rapide tandis que la génération de la réponse constitue la principale source de latence.
-
----
-
-# Structure technique
-
-| Fichier        | Rôle                                    |
-| -------------- | --------------------------------------- |
-| `app.py`       | Interface Streamlit                     |
-| `agent.py`     | Orchestration des actions               |
-| `router.py`    | Décision de l'action à exécuter         |
-| `memory.py`    | Gestion de la mémoire conversationnelle |
-| `tools.py`     | Outils de l'agent                       |
-| `ingest.py`    | Chargement et indexation des documents  |
-| `retriever.py` | Recherche sémantique et génération      |
-| `data/`        | Corpus documentaire                     |
-| `index_store/` | Stockage local de l'index FAISS         |
+> Dans les essais réalisés, la recherche vectorielle reste très rapide tandis que la génération de la réponse constitue la principale source de latence.
 
 ---
 
-# Technologies utilisées
+## 🧱 Structure technique
 
-* Python
-* Streamlit
-* Ollama
-* FAISS
-* LangChain
-* LangChain Community
-* LangChain Ollama
+| Fichier | Rôle |
+|---------|------|
+| `app.py` | Interface Streamlit |
+| `agent.py` | Orchestration des actions |
+| `router.py` | Décision de l'action à exécuter |
+| `memory.py` | Gestion de la mémoire conversationnelle |
+| `tools.py` | Outils de l'agent |
+| `ingest.py` | Chargement et indexation des documents |
+| `retriever.py` | Recherche sémantique et génération |
+| `database.py` | Historique des interactions (SQLite) |
+| `data/` | Corpus documentaire |
+| `index_store/` | Stockage local de l'index FAISS |
 
 ---
 
-# Dépannage
+## 🛠️ Technologies utilisées
 
-## Erreur
+- Python
+- Streamlit
+- Ollama
+- FAISS
+- LangChain
+- LangChain Community
+- LangChain Ollama
+- SQLite
 
-```text
-ModuleNotFoundError: No module named 'docx2txt'
-```
+---
 
-Installer la dépendance :
+## 🔧 Dépannage
+
+### Erreur : `ModuleNotFoundError: No module named 'docx2txt'`
 
 ```bash
 pip install docx2txt
 ```
 
----
-
-## Temps de réponse élevé
+### Temps de réponse élevé
 
 Pour réduire la latence :
 
-* diminuer la valeur de `top_k` ;
-* réduire la taille du contexte envoyé au modèle ;
-* utiliser un modèle plus léger ;
-* vérifier que le GPU est correctement utilisé par Ollama.
+- Diminuer la valeur de `top_k`
+- Réduire la taille du contexte envoyé au modèle
+- Utiliser un modèle plus léger
+- Vérifier que le GPU est correctement utilisé par Ollama
 
 ---
 
-# Évolutions possibles
+## 🚀 évolutions possibles
 
-* routeur basé sur un LLM ;
-* comparaison automatique de documents ;
-* résumé de documents ;
-* reranker ;
-* mémoire persistante ;
-* historique des utilisateurs et des requêtes ;
-* journalisation dans SQLite ;
-* mode streaming des réponses ;
-* Dockerisation ;
-* orchestration avec LangGraph.
+- [ ] Routeur basé sur un LLM
+- [ ] Comparaison automatique de documents
+- [ ] Résumé de documents
+- [ ] Reranker
+- [ ] Mémoire persistante
+- [ ] Historique des utilisateurs et des requÃªtes
+- [ ] Journalisation avancée dans SQLite
+- [ ] Mode streaming des réponses
+- [ ] Dockerisation
+- [ ] Orchestration avec LangGraph
+
+---
