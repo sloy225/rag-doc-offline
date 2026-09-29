@@ -10,3 +10,4 @@ pandas
 openpyxl
 faiss-cpu
 docx2txt
+psutil

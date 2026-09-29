@@ -1,4 +1,5 @@
 from __future__ import annotations
+from monitoring import get_system_info
 
 from database import (
     init_db,
@@ -54,6 +55,24 @@ st.caption(
     "Python • Streamlit • Ollama • FAISS • Agent IA"
 )
 
+system_info = get_system_info()
+
+st.sidebar.subheader("🖥️ Ressources machine")
+
+st.sidebar.metric(
+    "RAM utilisée",
+    f"{system_info['ram_percent']:.1f}%"
+)
+
+st.sidebar.metric(
+    "RAM disponible",
+    f"{system_info['ram_available_gb']:.1f} Go"
+)
+
+st.sidebar.metric(
+    "CPU",
+    f"{system_info['cpu_percent']:.1f}%"
+)
 # -----------------------------
 # Sidebar
 # -----------------------------
